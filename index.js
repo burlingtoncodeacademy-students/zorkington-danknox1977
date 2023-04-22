@@ -1,5 +1,9 @@
-const readline = require('readline');
-const readlineInterface = readline.createInterface(process.stdin, process.stdout);
+const { lookup } = require("dns");
+const readline = require("readline");
+const readlineInterface = readline.createInterface(
+  process.stdin,
+  process.stdout
+);
 
 function ask(questionText) {
   return new Promise((resolve, reject) => {
@@ -7,104 +11,137 @@ function ask(questionText) {
   });
 }
 
+let defaultText = "\033[39m";
+let greenText = "\033[32m";
+let yellowText = "\033[0;33m";
+let redText = "\033[91m";
+let blueText = "\033[94m";
+let grayText = "\033[90m";
+
+// ---------------------------------------ClassPlayerAndRelated----------------------------------------------- //
+
+class Player {
+  constructor(name, mainSkill, dispo, chi, currentLocation, Inventory) {
+    this.name = name;
+    this.mainSkill = mainSkill;
+    this.dispo = dispo;
+    this.chi = chi;
+    this.currentLocation = currentLocation;
+    this.Inventory = Inventory;
+  }
+}
+
+// -------------------------------------ClassPlayerInventory-------------------------------------------------- //
+
+class Inventory extends Player {
+  constructor() {
+    this.item = []; // array of two-element arrays, [[item, quant], [item, quant], etc.]
+  }
+
+  // -------------------------------------PlayerAddInventoryFunction-------------------------------------------------- //
+  addItem(item, quantity) {
+    this.items.push([item, quantity]);
+  }
+}
+
+const playerOne = new Player(
+  "Chuck",
+  "Willful Ignorance",
+  "Smug",
+  40000,
+  "Front Porch",
+  ["cellphone", "uber eats"]
+);
+
+
+// ---------------------------------AsyncInterfaceLoop(s)-------------------------------------------------- //
+
 start();
 
 async function start() {
   const welcomeMessage = `182 Main St.
 You are standing on Main Street between Church and South Winooski.
-There is a door here. A keypad sits on the handle.
-On the door is a handwritten sign. `;
+There is a door here. The doorknob has a keypad built-in.
+On the door is a handwritten sign. \n NO UNAUTHORIZED VISITORS -That means you Carl
+You are meant to Deliver the Uber_Eats to someone at this address.
+What do you do? `;
+
+console.log(playerOne.currentLocation);
   let answer = await ask(welcomeMessage);
+  if (answer == checkStatus) {
+    console.log(playerOne.dispo);
 
+    //else if for menu
+  } else if (answer == menu) {
+    console.log(menu);
 
+    //else if for exit
+  } else if (answer == exit) {
+    process.exit();
 
-  console.log('Now write your code to make this work! ');
-  process.exit();
+    //else for help
+  } else {
+    console.log(`type "help" for a list commands`);
+  }
 }
 
-
-//questions about state machines
 // -------------------------------------MovementStateMachine------------------------------------------------ //
 
-const bldgMap = {
-  'Front Porch': {'Driveway': 000, 'Foyer': 250},
-    'Driveway': {'Front Porch': 250, 'Car' : 000},
-    'Foyer': {'Front Porch': 250, 'Hall': 250, 'Stairs btw 1st and 2nd': 5000, 'Dining': 250},
-    'Dining': {'Foyer': 250, 'Kitchen': 250}
 
+const bldgMap = {
+  "Front Porch": { Driveway: 000, Foyer: 250 },
+  Driveway: { "Front Porch": 250, Car: 000 },
+  Foyer: {
+    "Front Porch": 250,
+    Hall: 250,
+    "Stairs btw 1st and 2nd": 5000,
+    Dining: 250,
+  },
+  Dining: { Foyer: 250, Kitchen: 250 },
+
+
+
+  //method to move between locations
+
+  move(newLocation) {
+    const possMoves = bldgMap[this.currentLocation];
+    if (newLocation in possMoves) {
+      if (possMoves[newLocation] > this.chi) {
+        console.log("Alas, Grasshopper, you are not ready to move here. ");
+        //chi refers to the value of the key of whatever newLocation they're referring
+      } else {
+        console.log(`Moving to ${newLocation}... `);
+        this.currentLocation = newLocation;
+      }
+    } else {
+      console.log(`Cannot move to ${newLocation}. Try Again. `);
+    }
+  }
+
+  //method to list possible moves from current location
+  //doesn't work yet
+  getMoves() {
+    const possMoves = bldgMap[this.currentLocation];
+    for (const m in possMoves) {
+      if (possMoves[m] <= this.chi) {
+        console.log(m.toLowerCase());
+      } else {
+        console.log("there are no moves, you are trapped\nGaMe OvEr!!!?!!?");
+        process.exit();
+      }
+    }
+  }
 }
 
 
-class Player {
-  constructor (name, mainSkill, dispo, chi, currentLocation) {
-  this.name = name
-  this.mainSkill = mainSkill
-  this.dispo = dispo
-  this.chi = chi
-  this.currentLocation = currentLocation
- 
-  }
-//method to move between locations
-  move (newLocation) {
-      const possMoves = bldgMap[this.currentLocation]
-      if (newLocation in possMoves) {
+// playerOne.move("Driveway");
 
-          if (possMoves[newLocation] > this.chi) {
-          console.log('Alas, Grasshopper, you are not ready to move here. ')
-          //chi refers to the value of the key of whatever newLocation they're referring
-          } else {
+// console.log(playerOne.currentLocation);
+// console.log(playerOne.chi);
 
-          console.log(`Moving to ${newLocation}... `)
-          this.currentLocation = newLocation
-          }
-      } else {
-
-        console.log(`Cannot move to ${newLocation}. Try Again. `) 
-      }
-  }
-//method to list possible moves from current location
-//doesn't work yet
-  getMoves () {
-      const possMoves = bldgMap[this.currentLocation]
-      for (const m in possMoves) {
-          if (possMoves[m] <= this.chi) {
-              console.log(m.toUpperCase())
-          }
-      }
-  }        
-}      
-
-  
+// console.log(playerOne.getMoves);
 
 
-//add method to move  somewhere else
-
-const playerOne = new Player('Chuck', 'Willful Ignorance', 'Smug', 40000, 'Front Porch')
-
-console.log(playerOne)
-
-console.log(playerOne.currentLocation.getMoves)
-
-playerOne.move('Driveway')
-
-console.log(playerOne.currentLocation)
-console.log(playerOne.chi)
-
-console.log(playerOne.getMoves)
-
-playerOne.move('Front Porch')
-
-console.log(playerOne.currentLocation)
-console.log(playerOne.chi)
-
-console.log(playerOne.getMoves)
-
-playerOne.move('Foyer')
-
-console.log(playerOne.currentLocation)
-console.log(playerOne.chi)
-
-console.log(playerOne.getMoves)
 
 
 // * The current room
@@ -123,15 +160,14 @@ console.log(playerOne.getMoves)
 
 //Room Class
 class Room {
-  constructor (name, connections, itemsOfInterest, elevation) {
-    this.name = name
-    this.connections = connections //mutable?
-    this.itemsOfInterest = location
-    this.elevation = elevation
-
+  constructor(name, connections, RoomItem, locked, elevation) {
+    this.name = name;
+    this.connections = connections; //mutable?
+    this.RoomItem = RoomItem; //extended to different class
+    this.locked = Boolean;
+    this.elevation = elevation;
   }
 }
-
 
 // class Floor extends Room {
 //   constructor (name, elevation, statusEffect) {
@@ -146,38 +182,34 @@ class Room {
 //     this.name = name
 //   }
 
-
-
 // -------------------------------------Item ClassDeclaration-------------------------------------------------- //
 
-
-
-class RoomItems {
-  constructor (id, name, value, weight) {
-    this.id = id
-    this.name = name
-    this.value = value
-    this.weight = weight
+class RoomItem extends Room {
+  constructor(id, name, value, weight) {
+    this.id = id;
+    this.name = name;
+    this.value = value;
+    this.weight = weight;
   }
 }
-
-
-// -------------------------------------ClassPlayerInventory-------------------------------------------------- //
-
-class Inventory {
-  constructor () {
-    this.items = []  // array of two-element arrays, [[item, quant], [item, quant], etc.]
-  }
-// -------------------------------------PlayerAddInventoryFunction-------------------------------------------------- //
-  addItem (item, quantity) {
-    this.items.push([item, quantity])
-  }
-}
-
 
 // -------------------------------------playerInput------------------------------------------------- //
 
 // should take a 2 word command and then differentiate between action and item
 
-// async function await ask 
+// async function await ask
 
+// ------------------------------------PlayerCommands------------------------------------------------ //
+
+let commands = {
+  inventory: ["i", "inventory", "inv"],
+  possibleMoves: ["where to"],
+  move: ["move"],
+  take: ["take"],
+  drop: ["drop"],
+  use: ["use"],
+  look: ["l", "look"],
+  helpList: ["h", "help"],
+  checkStatus: ["status", "check status"],
+  menu: ["m", "menu"]
+};

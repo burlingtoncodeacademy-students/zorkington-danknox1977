@@ -50,54 +50,78 @@ const playerOne = new Player(
   "Smug",
   40000,
   "Front Porch",
-  ["cellphone", "uber eats"]
+  ["cellphone, 1", "uber eats, 1"]
 );
 
+// ---------------------------------GameFiles--------------------------------------------------- //
+var gameStatus = "pending"
+
+
+const welcomeMessage = `182 Main St.
+You are standing on Main Street between Church and South Winooski.
+There is a door here. The doorknob has a keypad built-in.
+On the door is a handwritten sign. \nNO UNAUTHORIZED VISITORS -This means you Carl
+You are meant to Deliver the Uber Eats to someone at this address.`;
+
+const prompt = `What do you do? >_`;
 
 // ---------------------------------AsyncInterfaceLoop(s)-------------------------------------------------- //
 
 start();
 
 async function start() {
-  const welcomeMessage = `182 Main St.
-You are standing on Main Street between Church and South Winooski.
-There is a door here. The doorknob has a keypad built-in.
-On the door is a handwritten sign. \n NO UNAUTHORIZED VISITORS -That means you Carl
-You are meant to Deliver the Uber_Eats to someone at this address.
-What do you do? `;
+  
+  gameStatus = "start"
 
-console.log(playerOne.currentLocation);
-  let answer = await ask(welcomeMessage);
-  if (answer == checkStatus) {
+  console.log(welcomeMessage)
+
+  while (gameStatus !== "end") {
+    let answer = await ask(prompt);
+    
+    if (answer == "checkStatus") {
     console.log(playerOne.dispo);
 
     //else if for menu
-  } else if (answer == menu) {
-    console.log(menu);
+    } else if (answer == "menu") {
+    console.log("menu");
 
-    //else if for exit
-  } else if (answer == exit) {
-    process.exit();
+    // else if for where?
+    } else if (answer == "where") {
+    console.log(playerOne.currentLocation);
 
     //else for help
-  } else {
+    } else {
     console.log(`type "help" for a list commands`);
-  }
-}
+    }
 
+
+
+}
+//else for exit
+process.exit();
+}
 // -------------------------------------MovementStateMachine------------------------------------------------ //
 
 
 const bldgMap = {
-  "Front Porch": { Driveway: 000, Foyer: 250 },
-  Driveway: { "Front Porch": 250, Car: 000 },
+  "Front Porch": { 
+    Driveway: 000,
+    Foyer: 250
+  },
+  Driveway: {
+    "Front Porch": 250,
+    Car: 000
+  },
   Foyer: {
     "Front Porch": 250,
     Hall: 250,
     "Stairs btw 1st and 2nd": 5000,
     Dining: 250,
   },
-  Dining: { Foyer: 250, Kitchen: 250 },
+  Dining: {
+    Foyer: 250,
+    Kitchen: 250
+  },
 
 
 
@@ -116,7 +140,7 @@ const bldgMap = {
     } else {
       console.log(`Cannot move to ${newLocation}. Try Again. `);
     }
-  }
+  },
 
   //method to list possible moves from current location
   //doesn't work yet

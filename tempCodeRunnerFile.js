@@ -1,1 +1,1 @@
-process.exit();
+   // console.log(word1);

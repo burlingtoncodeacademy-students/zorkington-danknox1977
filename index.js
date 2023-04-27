@@ -33,155 +33,20 @@ const bldgMap = {
   kitchen: ["dining", "hall"],
 };
 
-// ---------------------------------------ClassPlayerAndRelated----------------------------------------------- //
-
-class Item {
-  constructor(name, what) {
-    this.name = name;
-    this.what = what;
-  }
-}
-
-let player = {
-  inventory: [],
-};
-
-// class Player {
-//   constructor(name, mainSkill, dispo, Room, Inventory) {
-//     // this.name = name;
-//     // this.mainSkill = mainSkill;
-//     // this.dispo = dispo;
-//     this.Room = Room;
-//     this.Inventory = Inventory;
-//   }
-
-//method to move between locations
+//function to move between locations
 
 function move(newLocation) {
   let possMoves = bldgMap[currentLocation];
   console.log(possMoves);
 
   if (!possMoves.includes(newLocation)) {
-    console.log(`Unfortumantely, you can not go to ${newLocation} from ${currentLocation}`);
-    
+    console.log(
+      `Unfortumantely, you can not go to ${newLocation} from ${currentLocation}`
+    );
   } else {
     console.log(`Moving to ${newLocation}... `);
     currentLocation = newLocation;
   }
-
-}
-
-
-
-// -----------------------------------PlayerOne------------------------------------------------------ //
-
-// const playerOne = new Player("Chuck", "Willful Ignorance", "Smug", "Car", [
-//   "cellphone",
-//   "uber eats",
-// ]);
-
-//   // -------------------------------------PlayerAddInventoryMethod-------------------------------------------------- //
-//   addItem(item) {
-//     this.Inventory.push(item);
-//   }
-// }
-
-// ---------------------------------GameFiles--------------------------------------------------- //
-var gameStatus = "pending";
-
-const welcomeMessage = `182 Main St.
-You are standing on Main Street between Church and South Winooski.
-There is a door here. The doorknob has a keypad built-in.
-On the door is a handwritten sign. \nNO UNAUTHORIZED VISITORS -This means you Carl
-You are meant to Deliver the Uber Eats to someone at this address.`;
-
-const prompt = `What do you do? >_`;
-
-// ---------------------------------AsyncInterfaceLoop(s)-------------------------------------------------- //
-
-let currentLocation = "car";
-start();
-
-async function start() {
-  gameStatus = "start";
-
-  console.log(welcomeMessage);
-
-  while (gameStatus !== "end") {
-    let answer = await ask(prompt);
-
-    // -----------------------------------AnswerLogic--------------------------------------------------- //
-
-    var parseAnswer = [];
-    parseAnswer.push(answer.toLowerCase().split(" "));
-
-    var words = parseAnswer[0];
-    var word1 = words[0];
-    var word2 = words[1];
-
-    // console.log(parseAnswer);
-
-    // console.log(word1)
-    // console.log(word2)
-
-    //if for inventory
-    if (commands.inventory.includes(word1)) {
-      inventory();
-
-      //else if for getMoves
-    } else if (commands.possibleMoves.includes(word1)) {
-      console.log(currentLocation);
-      // console.log(playerOne.getMoves());
-      console.log(bldgMap[currentLocation]);
-      console.log(bldgMap.word2);
-
-      //else if for menu
-    } else if (answer == "menu") {
-      console.log("menu");
-
-      // else if for look
-    } else if (commands.look.includes(word1)) {
-      console.log(playerOne.Room.what);
-
-      //else if for status
-    } else if (commands.checkStatus.includes(word1)) {
-      console.log(playerOne.dispo);
-
-      //else if for take
-    } else if (commands.take.includes(word1)) {
-      console.log("take");
-
-      //else if for drop
-    } else if (commands.drop.includes(word1)) {
-      console.log("drop");
-
-      //else if for use
-    } else if (commands.use.includes(word1)) {
-      console.log("use");
-
-      //else if for move
-    } else if (commands.move.includes(word1)) {
-      move(word2);
-
-      console.log("move");
-
-      //else if for Help!
-    } else if (commands.helpList.includes(word1)) {
-      console.log("help");
-
-      //Should include list of commands and directions on how to use two word answers
-
-      //else if for quit
-    } else if (commands.quit.includes(word1)) {
-      quit();
-
-      //else for help
-    } else {
-      console.log(`type "help" for a list commands`);
-    }
-  }
-  //else for exit
-  process.exit();
 }
 
 // ---------------------------------Room Classes--------------------------------------------------- //
@@ -193,6 +58,10 @@ class Room {
     this.what = what;
     this.Item = [];
     this.locked = locked;
+  }
+
+  look() {
+    console.log(this.what);
   }
 }
 
@@ -211,7 +80,7 @@ const car = new Room(
 const frontPorch = new Room(
   "Porch",
   "The area before the entrance could better be described as a sidewalk",
-  ["Front Door"],
+  ["Keypad"],
   false
 );
 
@@ -248,23 +117,10 @@ const stairs = new Room(
 
 const deliverance = new Room(
   "Deliverance",
-  "The job of the open road, on to the next adventure!",
+  "The open road, on to the next adventure!",
   ["Freedom"],
   true
 );
-
-// class Floor extends Room {
-//   constructor (name, elevation, statusEffect) {
-//     this.name = name
-//     this.elevation = elevation
-//     this.statusEffect = statusEffect
-//   }
-// }
-
-// class Reality extends Location {
-//   constructor (name, mutable?, immutable?) {
-//     this.name = name
-//   }
 
 // -------------------------------------Item ClassDeclaration-------------------------------------------------- //
 
@@ -282,7 +138,7 @@ const deliverance = new Room(
 
 let commands = {
   inventory: ["i", "inventory", "inv"],
-  possibleMoves: ["where"],
+  possibleMoves: ["w", "where"],
   move: ["m", "move"],
   take: ["t", "take"],
   drop: ["d", "drop"],
@@ -295,15 +151,15 @@ let commands = {
 };
 
 function inventory() {
-  console.log(playerOne.Inventory);
+  console.log(player.inventory);
 }
 
 function take() {
-  playerOne.Inventory.addItem(item);
+  player.inventory.addItem(item);
 }
 
 function drop() {
-  playerOne.Inventory.slice(item);
+  player.inventory.slice(item);
   newLocation.Item.push(item);
 }
 
@@ -312,15 +168,18 @@ function use() {
 }
 
 function lookRoom() {
-  console.log(newLocation.what);
+  // let lookRoom = Room(currentLocation)
+
+  console.log(Room.look());
+
+  // console.log(currentLocation.what)
+  // console.log(Room(currentLocation).look)
+  // console.log(lookRoom.what)
+  // console.log(newLocation.what);
 }
 
 function lookItem() {
   console.log(item.what);
-}
-
-function checkStatus() {
-  console.log(playerOne.dispo);
 }
 
 function help() {}
@@ -328,6 +187,107 @@ function help() {}
 function menu() {}
 
 function quit() {
-  console.log(`Thanks for Playing ${playerOne.name}!`);
+  console.log("Thanks for Playing");
+  process.exit();
+}
+
+// ---------------------------------------InventoryAndPlayer----------------------------------------------- //
+
+class Item {
+  constructor(name, what) {
+    this.name = name;
+    this.what = what;
+  }
+}
+
+let player = {
+  inventory: [],
+};
+
+// ---------------------------------GameFiles--------------------------------------------------- //
+var gameStatus = "pending";
+
+const welcomeMessage = `182 Main St.
+You are standing on Main Street between Church and South Winooski.
+There is a door here. The doorknob has a keypad built-in.
+On the door is a handwritten sign. \nNO UNAUTHORIZED VISITORS -This means you Carl
+You are meant to Deliver the Uber Eats to someone at this address.`;
+
+const prompt = `What do you do? >_`;
+
+// ---------------------------------AsyncInterfaceLoop(s)-------------------------------------------------- //
+
+let currentLocation = "car";
+start();
+
+async function start() {
+  gameStatus = "start";
+
+  console.log(welcomeMessage);
+
+  while (gameStatus !== "end") {
+    let answer = await ask(prompt);
+
+    // -----------------------------------SplittingResponseInto2Words--------------------------------------------------- //
+
+    var parseAnswer = [];
+    parseAnswer.push(answer.toLowerCase().split(" "));
+
+    var words = parseAnswer[0];
+    var word1 = words[0];
+    var word2 = words[1];
+
+    //if for inventory
+    if (commands.inventory.includes(word1)) {
+      inventory();
+
+      //else if for possMoves
+    } else if (commands.possibleMoves.includes(word1)) {
+      console.log(`You are currently in ${currentLocation}.`);
+      console.log(bldgMap[currentLocation]);
+      console.log(JSON.stringify(bldgMap[currentLocation]));
+
+      //else if for menu
+    } else if (answer == "menu") {
+      console.log("menu");
+
+      // else if for look
+    } else if (commands.look.includes(word1)) {
+      lookRoom();
+
+      //else if for take
+    } else if (commands.take.includes(word1)) {
+      console.log("take");
+
+      //else if for drop
+    } else if (commands.drop.includes(word1)) {
+      console.log("drop");
+
+      //else if for use
+    } else if (commands.use.includes(word1)) {
+      console.log("use");
+
+      //else if for move
+    } else if (commands.move.includes(word1)) {
+      move(word2);
+
+      console.log("move");
+
+      //else if for Help!
+    } else if (commands.helpList.includes(word1)) {
+      console.log("help");
+
+      //Should include list of commands and directions on how to use two word answers
+
+      //else if for quit
+    } else if (commands.quit.includes(word1)) {
+      quit();
+
+      //else for help
+    } else {
+      console.log(`type "help" for a list commands`);
+    }
+  }
+  //else for exit
   process.exit();
 }

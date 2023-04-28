@@ -267,6 +267,13 @@ function move(newLocation) {
     console.log(
       `Unfortumantely, you can not go to ${newLocation} from ${currentLocation}`
     );
+  } else if (roomLookUp.foyer.name.includes(newLocation)) {
+    if (foyer.locked === true) {
+   console.log(`The front door is locked, use keypad to enter.`)
+    } else {
+      console.log(`You enter the building.`)
+      currentLocation = newLocation
+    }
   } else {
     console.log(`Moving to ${newLocation}... `);
     currentLocation = newLocation;
@@ -278,16 +285,16 @@ function possibleMoves() {
   console.log(`From here you can go to: ${poss}`);
 }
 
-function take(newItem) {
+function take(addItem) {
   if (
-    itemLookUp.name.includes(newItem) &&
+    itemLookUp.name.includes(addItem) &&
     roomLookUp.Item.includes(currentLocation)
   ) {
-    player.inventory.addItem(newItem);
+    player.inventory.addItem(addItem);
   }
 }
 
-function use() {
+function use(useItem) {
   //Placeholder
 }
 
@@ -366,6 +373,7 @@ async function start() {
       //else if for Help!
     } else if (commands.helpList.includes(word1)) {
       console.log("help");
+      help()
 
       //Should include list of commands and directions on how to use two word answers
 

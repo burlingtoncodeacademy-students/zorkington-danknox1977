@@ -95,7 +95,7 @@ const kitchen = new Room(
 
 const porch = new Room(
   "porch",
-  "The area before the entrance could better be described as a sidewalk",
+  "The area before the entrance could better be described as a sidewalk, \nA keypad by the door awaits your input.",
   // [keypad],
   false
 );
@@ -234,11 +234,17 @@ function look(objOfInt) {
         console.log(`${objOfInt} is not at ${currentLocation}.`)
     }
   } else if (itemLookUp.uber_eats.name.includes(objOfInt)) {
-    if (itemLookUp.uber_eats.place.includes(currentLocation)) {
+    if (itemLookUp.uber_eats.place == "inventory") {
+      console.log(uber_eats.what)
+    } else if (itemLookUp.uber_eats.place.includes(currentLocation)) {
       console.log(uber_eats.what)
     } else {
       console.log(`${objOfInt} is not at ${currentLocation}.`)
-    };
+    }
+  
+      
+   
+    
   // } else if (itemLookUp.Item.name.includes(objOfInt)) {
   //   if (itemLookUp.item.place.includes(currentLocation)) {
   //     console.log(Item.what);
@@ -246,13 +252,13 @@ function look(objOfInt) {
   //     console.log(`${objOfInt} is not at ${currentLocation}.`)
   //   }
   
-    
-  
-} else {
-  console.log(`You can not see ${objOfInt} from ${currentLocation}`);
-     
+   
+
+  } else {
+    console.log(`You can not see ${objOfInt} from ${currentLocation}`);
+}    
 }
-}
+
 
 function menu() {
   //placeholder
@@ -285,12 +291,22 @@ function possibleMoves() {
   console.log(`From here you can go to: ${poss}`);
 }
 
-function take(addItem) {
-  if (
-    itemLookUp.name.includes(addItem) &&
-    roomLookUp.Item.includes(currentLocation)
-  ) {
-    player.inventory.addItem(addItem);
+function take(item2Add) {
+  // let item2Add = addItem
+  if (itemLookUp.uber_eats.name.includes(item2Add)) {
+      if (itemLookUp.uber_eats.place.includes(currentLocation)) {
+        if (itemLookUp.uber_eats.inv === true) {
+          console.log(`You add ${item2Add} to your inventory.`);
+          player.inventory.push(item2Add);
+          uber_eats.place = "inventory"
+          
+        
+          
+      } 
+    } 
+  } else {
+    console.log("You can't do that.")
+    
   }
 }
 

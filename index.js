@@ -206,9 +206,6 @@ function lookItem() {
 }
 //function to look at rooms
 function look(objOfInt) {
- 
-
- 
   if (objOfInt == currentLocation) {
     if (roomLookUp.car.name.includes(objOfInt)) {
       console.log(roomLookUp.car.what);
@@ -229,36 +226,29 @@ function look(objOfInt) {
     }
   } else if (itemLookUp.cellphone.name.includes(objOfInt)) {
     if (itemLookUp.cellphone.place.includes(currentLocation)) {
-        console.log(cellphone.what)
+      console.log(cellphone.what);
     } else {
-        console.log(`${objOfInt} is not at ${currentLocation}.`)
+      console.log(`${objOfInt} is not at ${currentLocation}.`);
     }
   } else if (itemLookUp.uber_eats.name.includes(objOfInt)) {
     if (itemLookUp.uber_eats.place == "inventory") {
-      console.log(uber_eats.what)
+      console.log(uber_eats.what);
     } else if (itemLookUp.uber_eats.place.includes(currentLocation)) {
-      console.log(uber_eats.what)
+      console.log(uber_eats.what);
     } else {
-      console.log(`${objOfInt} is not at ${currentLocation}.`)
+      console.log(`${objOfInt} is not at ${currentLocation}.`);
     }
-  
-      
-   
-    
-  // } else if (itemLookUp.Item.name.includes(objOfInt)) {
-  //   if (itemLookUp.item.place.includes(currentLocation)) {
-  //     console.log(Item.what);
-  //   } else {
-  //     console.log(`${objOfInt} is not at ${currentLocation}.`)
-  //   }
-  
-   
 
+    // } else if (itemLookUp.Item.name.includes(objOfInt)) {
+    //   if (itemLookUp.item.place.includes(currentLocation)) {
+    //     console.log(Item.what);
+    //   } else {
+    //     console.log(`${objOfInt} is not at ${currentLocation}.`)
+    //   }
   } else {
     console.log(`You can not see ${objOfInt} from ${currentLocation}`);
-}    
+  }
 }
-
 
 function menu() {
   //placeholder
@@ -275,10 +265,10 @@ function move(newLocation) {
     );
   } else if (roomLookUp.foyer.name.includes(newLocation)) {
     if (foyer.locked === true) {
-   console.log(`The front door is locked, use keypad to enter.`)
+      console.log(`The front door is locked, use keypad to enter.`);
     } else {
-      console.log(`You enter the building.`)
-      currentLocation = newLocation
+      console.log(`You enter the building.`);
+      currentLocation = newLocation;
     }
   } else {
     console.log(`Moving to ${newLocation}... `);
@@ -294,24 +284,51 @@ function possibleMoves() {
 function take(item2Add) {
   // let item2Add = addItem
   if (itemLookUp.uber_eats.name.includes(item2Add)) {
-      if (itemLookUp.uber_eats.place.includes(currentLocation)) {
-        if (itemLookUp.uber_eats.inv === true) {
-          console.log(`You add ${item2Add} to your inventory.`);
-          player.inventory.push(item2Add);
-          uber_eats.place = "inventory"
-          
-        
-          
-      } 
-    } 
+    if (itemLookUp.uber_eats.place.includes(currentLocation)) {
+      if (itemLookUp.uber_eats.inv === true) {
+        console.log(`You add ${item2Add} to your inventory.`);
+        player.inventory.push(item2Add);
+        uber_eats.place = "inventory";
+      }
+    }
   } else {
-    console.log("You can't do that.")
-    
+    console.log("You can't do that.");
   }
 }
+// -------------------------------------UseItem--------------------------------------------------- //
 
 function use(useItem) {
-  //Placeholder
+  if (itemLookUp.keypad.name.includes(useItem)) {
+    start();
+    async function start() {
+      var door = "locked";
+      let doorPrompt = "Please input PassCode to enter (type exit to end) >_";
+      while (door !== "open" || passCode == "exit") {
+        let passCode = await ask(doorPrompt);
+
+        if (passCode !== "93378") {
+          if (passCode !== "exit") {
+            console.log(passCode);
+            console.log("A disembodied voice drones : That code is incorrect.");
+          } else {
+            console.log(passCode);
+            passcode = "exit";
+            // process.exit()
+          }
+        } else {
+          console.log(passCode);
+          console.log(
+            "A barely audible *click* and the heavy door creaks open."
+          );
+          door = "open";
+          foyer.locked == false;
+          console.log(foyer.locked);
+        }
+      }
+    }
+  } else {
+    console.log(`You can't use the ${useItem} that way.`);
+  }
 }
 
 function quit() {
@@ -352,50 +369,47 @@ async function start() {
     var word1 = words[0];
     var word2 = words[1];
 
-    //if for inventory
-    if (commands.inventory.includes(word1)) {
+    //if for drop
+    if (commands.drop.includes(word1)) {
+      console.log("drop");
+      drop(word2);
+
+      //else if for Help!
+      //Should include list of commands and directions on how to use two word answers
+    } else if (commands.helpList.includes(word1)) {
+      console.log("help");
+      help();
+
+      //else if for inventory
+    } else if (commands.inventory.includes(word1)) {
       inventory();
+
+      // else if for look
+    } else if (commands.look.includes(word1)) {
+      look(word2);
+      //else if for menu
+    } else if (answer == "menu") {
+      console.log("menu");
+      //else if for move
+    } else if (commands.move.includes(word1)) {
+      move(word2);
 
       //else if for possMoves
     } else if (commands.possibleMoves.includes(word1)) {
       possibleMoves();
 
-      //else if for menu
-    } else if (answer == "menu") {
-      console.log("menu");
-
-      // else if for look
-    } else if (commands.look.includes(word1)) {
-      look(word2);
-
       //else if for take
     } else if (commands.take.includes(word1)) {
-      console.log("take");
       take(word2);
-
-      //else if for drop
-    } else if (commands.drop.includes(word1)) {
-      console.log("drop");
-      drop(word2);
-
-      //else if for use
-    } else if (commands.use.includes(word1)) {
-      console.log("use");
-
-      //else if for move
-    } else if (commands.move.includes(word1)) {
-      move(word2);
-
-      //else if for Help!
-    } else if (commands.helpList.includes(word1)) {
-      console.log("help");
-      help()
-
-      //Should include list of commands and directions on how to use two word answers
 
       //else if for quit
     } else if (commands.quit.includes(word1)) {
       quit();
+
+      //else if for use
+    } else if (commands.use.includes(word1)) {
+      console.log("use");
+      use(word2);
 
       //else for help
     } else {
@@ -423,4 +437,4 @@ let itemLookUp = {
   // silverware_drawer: silverware_drawer,
   // skateboard: skateboard,
   uber_eats: uber_eats,
-}
+};

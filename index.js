@@ -37,108 +37,77 @@ const bldgMap = {
 
 //Room Class
 class Room {
-  constructor(name, what, Item, locked) {
+  constructor(name, what, locked) {
     this.name = name;
     this.what = what;
-    this.Item = Item;
+    // this.Item = Item;
     this.locked = locked;
-  }
-
-  look() {
-    console.log(this.what);
   }
 }
 
 const car = new Room(
   "car",
-  "A late model Kia Sorrento, idling obediently, lights on -with some muted music wafting from a slightly ajar window.",
-  ["cellphone", "uber_eats"],
-  true
+  "A late model Kia Sorrento, idling obediently, lights on -with some muted music wafting \nfrom a slightly ajar window. Your cellphone battery is too low to remove from the charger,\nThe order of Uber Eats is on the passenger seat.",
+  // [cellphone, uber_eats],
+  false
 );
 
 const deliverance = new Room(
   "deliverance",
   "The open road, on to the next adventure!",
-  ["Freedom"],
+  // ["freedom"],
   true
 );
 
 const dining = new Room(
   "dining room",
-  "A formal dining room, not the kind for everyday eating, covered in periodicals and office supplies.",
-  ["Outdoor Life Magazine", "Ink Pen"],
+  "A formal dining room, not the kind for everyday eating, covered in periodicals \nand office supplies.",
+  // ["outdoor_life_magazine", "ink_pen"],
   false
 );
 const driveway = new Room(
   "driveway",
-  "You look back at where you parked your car and hope you won't have to leave it idling too long...",
-  ["car", "salvation"],
-  true
+  "You look back at where you parked your car and hope you won't have to leave it idling \ntoo long...",
+  // ["gravel", "cigarette_butts"],
+  false
 );
 
 const foyer = new Room(
   "foyer",
-  "Or, antechamber, looks deserted only the sound of a distant television betrays the\n prescence of other humans. There is a stair going up and a hall to your left.",
-  ["Directory"],
+  "Or, antechamber, looks deserted only the sound of a distant television betrays the\nprescence of other humans. There is a stair going up and a hall to your left.",
+  // ["directory"],
   true
 );
 
 const hall = new Room(
   "hallway",
-  "A well lit hallway leading around the staircase going up to the second floor, there\n are doors closed doors leading off to the right and it makes a left hand turn\n into shadow...",
-  ["Painting"],
+  "A well lit hallway leading around the staircase going up to the second floor, there\nare doors closed doors leading off to the right and it makes a left hand turn\n into shadow...",
+  // ["painting"],
   false
 );
 
 const kitchen = new Room(
   "kitchen",
   "A lovely and well kept kitchen, nobody cooks here",
-  ["Fridge", "cabinet under sink", "microwave", "silverware drawer"],
+  // ["Fridge", "cabinet_under_sink", "microwave", "silverware_drawer"],
   false
 );
 
 const porch = new Room(
   "porch",
   "The area before the entrance could better be described as a sidewalk",
-  ["Keypad"],
+  // [keypad],
   false
 );
 
 const stairs = new Room(
   "stairs",
-  "A grand wooden staircase, the steps are just slightly too tall, as if made for someone a little taller than you are.",
-  ["Railing", "Skateboard"],
+  "A grand wooden staircase, the steps are just slightly too tall, as if made for \nsomeone a little taller than you are.",
+  // [railing, "skateboard"],
   true
 );
 
-// -------------------------------------Item ClassDeclaration-------------------------------------------------- //
-
-// class Item {
-//   constructor(id, name, value, weight, pickup) {
-//     this.id = id;
-//     this.name = name;
-//     this.value = value;
-//     this.weight = weight;
-//     this.pickup = pickup;
-//   }
-// }
-
-// ------------------------------------PlayerCommands------------------------------------------------ //
-
-let commands = {
-  drop: ["d", "drop"],
-  helpList: ["h", "help"],
-  inventory: ["i", "inventory", "inv"],
-  look: ["l", "look"],
-  menu: ["m", "menu"],
-  move: ["m", "move"],
-  possibleMoves: ["w", "where"],
-  quit: ["exit", "end", "quit"],
-  use: ["u", "use"],
-  take: ["t", "take"],
-};
-
-// -----------------------------------roomLookUp------------------------------------------------------ //
+// -----------------------------------room/LookUpTable------------------------------------------------------ //
 
 let roomLookUp = {
   car: car,
@@ -152,6 +121,71 @@ let roomLookUp = {
   stairs: stairs,
 };
 
+// -------------------------------------Item ClassDeclaration-------------------------------------------------- //
+
+class Item {
+  constructor(name, what, util, inv, place) {
+    this.name = name;
+    this.what = what;
+    this.util = util;
+    this.inv = inv;
+    this.place = place;
+  }
+}
+
+const cellphone = new Item(
+  "cellphone",
+  "Your cellphone, battery at an abysmmal 1%, will only function when plugged into you car \ncharger.",
+  false,
+  false,
+  "car"
+);
+
+const uber_eats = new Item(
+  "uber_eats",
+  "A bag of late night grub for your hungry customer inside, the note on the ticket provides\nthe entrance code: 93378.",
+  false,
+  true,
+  "car"
+);
+
+const keypad = new Item(
+  "keypad",
+  "The door code keypad, typical 10 key numeric, you will need to input the right \ncode to unlock the door.",
+  true,
+  false,
+  "porch"
+);
+
+const railing = new Item(
+  "railing",
+  "A strong wooden railing, this will allow you to safely ascend the staircase.",
+  true,
+  false,
+  "stairs"
+);
+
+// ------------------------------------PlayerCommands------------------------------------------------ //
+
+let commands = {
+  drop: ["d", "drop"],
+  helpList: ["h", "help"],
+  inventory: ["i", "inventory", "inv"],
+  look: ["l", "look"],
+  menu: ["m", "menu"],
+  move: ["m", "move"],
+  possibleMoves: ["w", "where"],
+  quit: ["x", "q", "exit", "end", "quit"],
+  use: ["u", "use"],
+  take: ["t", "take"],
+};
+
+// ---------------------------------------InventoryAndPlayer----------------------------------------------- //
+
+let player = {
+  inventory: [],
+};
+
 // --------------------------------------commandFunctions-------------------------------------------------- //
 
 function drop() {
@@ -160,7 +194,7 @@ function drop() {
 }
 
 function help() {
-  console.log(`You are currently at ${currentLocation}`)
+  console.log(`You are currently at ${currentLocation}`);
 }
 
 function inventory() {
@@ -172,6 +206,9 @@ function lookItem() {
 }
 //function to look at rooms
 function look(objOfInt) {
+ 
+
+ 
   if (objOfInt == currentLocation) {
     if (roomLookUp.car.name.includes(objOfInt)) {
       console.log(roomLookUp.car.what);
@@ -189,9 +226,31 @@ function look(objOfInt) {
       console.log(roomLookUp.porch.what);
     } else if (roomLookUp.stairs.name.includes(objOfInt)) {
       console.log(roomLookUp.stairs.what);
-  } else {
-    console.log(`You can not see ${objOfInt} from ${currentLocation}`);
-  }
+    }
+  } else if (itemLookUp.cellphone.name.includes(objOfInt)) {
+    if (itemLookUp.cellphone.place.includes(currentLocation)) {
+        console.log(cellphone.what)
+    } else {
+        console.log(`${objOfInt} is not at ${currentLocation}.`)
+    }
+  } else if (itemLookUp.uber_eats.name.includes(objOfInt)) {
+    if (itemLookUp.uber_eats.place.includes(currentLocation)) {
+      console.log(uber_eats.what)
+    } else {
+      console.log(`${objOfInt} is not at ${currentLocation}.`)
+    };
+  // } else if (itemLookUp.Item.name.includes(objOfInt)) {
+  //   if (itemLookUp.item.place.includes(currentLocation)) {
+  //     console.log(Item.what);
+  //   } else {
+  //     console.log(`${objOfInt} is not at ${currentLocation}.`)
+  //   }
+  
+    
+  
+} else {
+  console.log(`You can not see ${objOfInt} from ${currentLocation}`);
+     
 }
 }
 
@@ -219,8 +278,13 @@ function possibleMoves() {
   console.log(`From here you can go to: ${poss}`);
 }
 
-function take() {
-  player.inventory.addItem(item);
+function take(newItem) {
+  if (
+    itemLookUp.name.includes(newItem) &&
+    roomLookUp.Item.includes(currentLocation)
+  ) {
+    player.inventory.addItem(newItem);
+  }
 }
 
 function use() {
@@ -231,22 +295,10 @@ function quit() {
   console.log("Thanks for Playing");
   process.exit();
 }
-
-// ---------------------------------------InventoryAndPlayer----------------------------------------------- //
-
-class Item {
-  constructor(name, what) {
-    this.name = name;
-    this.what = what;
-  }
-}
-
-let player = {
-  inventory: [],
-};
-
-// ---------------------------------GameFiles--------------------------------------------------- //
+// ---------------------------------GameFiles--------------------------------------------------- //tiaint
 var gameStatus = "pending";
+
+let currentLocation = "car";
 
 const welcomeMessage = `182 Main St.
 You are standing on Main Street between Church and South Winooski.
@@ -258,7 +310,6 @@ const prompt = `What do you do? >_`;
 
 // ---------------------------------AsyncInterfaceLoop(s)-------------------------------------------------- //
 
-let currentLocation = "car";
 start();
 
 async function start() {
@@ -292,17 +343,17 @@ async function start() {
 
       // else if for look
     } else if (commands.look.includes(word1)) {
-      console.log(word1);
-      console.log(word2);
       look(word2);
 
       //else if for take
     } else if (commands.take.includes(word1)) {
       console.log("take");
+      take(word2);
 
       //else if for drop
     } else if (commands.drop.includes(word1)) {
       console.log("drop");
+      drop(word2);
 
       //else if for use
     } else if (commands.use.includes(word1)) {
@@ -329,4 +380,23 @@ async function start() {
   }
   //else for exit
   process.exit();
+}
+
+let itemLookUp = {
+  // cabinet_under_sink: cabinet_under_sink,
+  cellphone: cellphone,
+  // cigarette_butts: cigarette_butts,
+  // directory: directory,
+  // freedom: freedom,
+  // fridge: fridge,
+  // gravel: gravel,
+  // ink_pen: ink_pen,
+  keypad: keypad,
+  // microwave: microwave,
+  // outdoor_life_magazine: outdoor_life_magazine,
+  // painting: painting,
+  railing: railing,
+  // silverware_drawer: silverware_drawer,
+  // skateboard: skateboard,
+  uber_eats: uber_eats,
 }

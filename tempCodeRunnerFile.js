@@ -1,2 +1,2 @@
 
-function lookItem() {
+function look(objOfInt) {

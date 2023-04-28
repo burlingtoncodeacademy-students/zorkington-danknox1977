@@ -1,1 +1,2 @@
-let lookRoom = Room(currentLocation)
+
+function lookItem() {

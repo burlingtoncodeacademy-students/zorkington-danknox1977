@@ -13,41 +13,25 @@ function ask(questionText) {
 
 // ------------------------------------console.log(TextColors)------------------------------------------------ //
 
-let defaultText = "\033[39m";
-let greenText = "\033[32m";
-let yellowText = "\033[0;33m";
-let redText = "\033[91m";
 let blueText = "\033[94m";
+let defaultText = "\033[39m";
 let grayText = "\033[90m";
+let greenText = "\033[32m";
+let redText = "\033[91m";
+let yellowText = "\033[0;33m";
 
 // -------------------------------------MovementStateMachine------------------------------------------------ //
 
 const bldgMap = {
   car: ["driveway", "deliverance"],
-  porch: ["driveway", "foyer"],
+  dining: ["foyer", "kitchen"],
   driveway: ["porch", "car"],
   foyer: ["porch", "hall", "stairs", "dining"],
-  dining: ["foyer", "kitchen"],
-  stairs: ["foyer"],
   hall: ["foyer", "kitchen"],
   kitchen: ["dining", "hall"],
+  porch: ["driveway", "foyer"],
+  stairs: ["foyer"],
 };
-
-//function to move between locations
-
-function move(newLocation) {
-  let possMoves = bldgMap[currentLocation];
-  console.log(possMoves);
-
-  if (!possMoves.includes(newLocation)) {
-    console.log(
-      `Unfortumantely, you can not go to ${newLocation} from ${currentLocation}`
-    );
-  } else {
-    console.log(`Moving to ${newLocation}... `);
-    currentLocation = newLocation;
-  }
-}
 
 // ---------------------------------Room Classes--------------------------------------------------- //
 
@@ -56,7 +40,7 @@ class Room {
   constructor(name, what, Item, locked) {
     this.name = name;
     this.what = what;
-    this.Item = [];
+    this.Item = Item;
     this.locked = locked;
   }
 
@@ -65,60 +49,65 @@ class Room {
   }
 }
 
-const driveway = new Room(
-  "Driveway",
-  "You look back at where you parked your car and hope you won't have to leave it idling too long...",
-  ["car", "salvation"],
-  true
-);
 const car = new Room(
-  "Car",
+  "car",
   "A late model Kia Sorrento, idling obediently, lights on -with some muted music wafting from a slightly ajar window.",
   ["cellphone", "uber_eats"],
   true
 );
-const frontPorch = new Room(
-  "Porch",
+
+const deliverance = new Room(
+  "deliverance",
+  "The open road, on to the next adventure!",
+  ["Freedom"],
+  true
+);
+
+const dining = new Room(
+  "dining room",
+  "A formal dining room, not the kind for everyday eating, covered in periodicals and office supplies.",
+  ["Outdoor Life Magazine", "Ink Pen"],
+  false
+);
+const driveway = new Room(
+  "driveway",
+  "You look back at where you parked your car and hope you won't have to leave it idling too long...",
+  ["car", "salvation"],
+  true
+);
+
+const foyer = new Room(
+  "foyer",
+  "Or, antechamber, looks deserted only the sound of a distant television betrays the\n prescence of other humans. There is a stair going up and a hall to your left.",
+  ["Directory"],
+  true
+);
+
+const hall = new Room(
+  "hallway",
+  "A well lit hallway leading around the staircase going up to the second floor, there\n are doors closed doors leading off to the right and it makes a left hand turn\n into shadow...",
+  ["Painting"],
+  false
+);
+
+const kitchen = new Room(
+  "kitchen",
+  "A lovely and well kept kitchen, nobody cooks here",
+  ["Fridge", "cabinet under sink", "microwave", "silverware drawer"],
+  false
+);
+
+const porch = new Room(
+  "porch",
   "The area before the entrance could better be described as a sidewalk",
   ["Keypad"],
   false
 );
 
-const foyer = new Room(
-  "Foyer",
-  "Or, antechamber, looks deserted only the sound of a distant television betrays the\n prescence of other humans. There is a stair going up and a hall to your left.",
-  ["Directory"],
-  true
-);
-const hall = new Room(
-  "Hallway",
-  "A well lit hallway leading around the staircase going up to the second floor, there\n are doors closed doors leading off to the right and it makes a left hand turn\n into shadow...",
-  ["Painting"],
-  false
-);
-const dining = new Room(
-  "Dining Room",
-  "A formal dining room, not the kind for everyday eating, covered in periodicals and office supplies.",
-  ["Outdoor Life Magazine", "Ink Pen"],
-  false
-);
-const kitchen = new Room(
-  "Kitchen",
-  "A lovely and well kept kitchen, nobody cooks here",
-  ["Fridge", "cabinet under sink", "microwave", "silverware drawer"],
-  false
-);
 const stairs = new Room(
-  "Stairs between 1st & 2nd Floor",
+  "stairs",
   "A grand wooden staircase, the steps are just slightly too tall, as if made for someone a little taller than you are.",
-  ["Railling", "Skateboard"],
-  true
-);
-
-const deliverance = new Room(
-  "Deliverance",
-  "The open road, on to the next adventure!",
-  ["Freedom"],
+  ["Railing", "Skateboard"],
   true
 );
 
@@ -137,54 +126,106 @@ const deliverance = new Room(
 // ------------------------------------PlayerCommands------------------------------------------------ //
 
 let commands = {
-  inventory: ["i", "inventory", "inv"],
-  possibleMoves: ["w", "where"],
-  move: ["m", "move"],
-  take: ["t", "take"],
   drop: ["d", "drop"],
-  use: ["u", "use"],
-  look: ["l", "look"],
   helpList: ["h", "help"],
-  checkStatus: ["status", "check status"],
+  inventory: ["i", "inventory", "inv"],
+  look: ["l", "look"],
   menu: ["m", "menu"],
+  move: ["m", "move"],
+  possibleMoves: ["w", "where"],
   quit: ["exit", "end", "quit"],
+  use: ["u", "use"],
+  take: ["t", "take"],
 };
 
-function inventory() {
-  console.log(player.inventory);
-}
+// -----------------------------------roomLookUp------------------------------------------------------ //
 
-function take() {
-  player.inventory.addItem(item);
-}
+let roomLookUp = {
+  car: car,
+  deliverance: deliverance,
+  dining: dining,
+  driveway: driveway,
+  foyer: foyer,
+  hall: hall,
+  kitchen: kitchen,
+  porch: porch,
+  stairs: stairs,
+};
+
+// --------------------------------------commandFunctions-------------------------------------------------- //
 
 function drop() {
   player.inventory.slice(item);
   newLocation.Item.push(item);
 }
 
-function use() {
-  //Placeholder
+function help() {
+  console.log(`You are currently at ${currentLocation}`)
 }
 
-function lookRoom() {
-  // let lookRoom = Room(currentLocation)
-
-  console.log(Room.look());
-
-  // console.log(currentLocation.what)
-  // console.log(Room(currentLocation).look)
-  // console.log(lookRoom.what)
-  // console.log(newLocation.what);
+function inventory() {
+  console.log(player.inventory);
 }
 
 function lookItem() {
   console.log(item.what);
 }
+//function to look at rooms
+function look(objOfInt) {
+  if (objOfInt == currentLocation) {
+    if (roomLookUp.car.name.includes(objOfInt)) {
+      console.log(roomLookUp.car.what);
+    } else if (roomLookUp.deliverance.name.includes(objOfInt)) {
+      console.log(roomLookUp.deliverance.what);
+    } else if (roomLookUp.driveway.name.includes(objOfInt)) {
+      console.log(roomLookUp.driveway.what);
+    } else if (roomLookUp.foyer.name.includes(objOfInt)) {
+      console.log(roomLookUp.foyer.what);
+    } else if (roomLookUp.hall.name.includes(objOfInt)) {
+      console.log(roomLookUp.hall.what);
+    } else if (roomLookUp.kitchen.name.includes(objOfInt)) {
+      console.log(roomLookUp.kitchen.what);
+    } else if (roomLookUp.porch.name.includes(objOfInt)) {
+      console.log(roomLookUp.porch.what);
+    } else if (roomLookUp.stairs.name.includes(objOfInt)) {
+      console.log(roomLookUp.stairs.what);
+  } else {
+    console.log(`You can not see ${objOfInt} from ${currentLocation}`);
+  }
+}
+}
 
-function help() {}
+function menu() {
+  //placeholder
+}
 
-function menu() {}
+//function to move between locations
+
+function move(newLocation) {
+  let possMoves = bldgMap[currentLocation];
+
+  if (!possMoves.includes(newLocation)) {
+    console.log(
+      `Unfortumantely, you can not go to ${newLocation} from ${currentLocation}`
+    );
+  } else {
+    console.log(`Moving to ${newLocation}... `);
+    currentLocation = newLocation;
+  }
+}
+function possibleMoves() {
+  console.log(`You are currently in ${currentLocation}.`);
+  let poss = JSON.stringify(bldgMap[currentLocation]);
+  console.log(`From here you can go to: ${poss}`);
+}
+
+function take() {
+  player.inventory.addItem(item);
+}
+
+function use() {
+  //Placeholder
+}
 
 function quit() {
   console.log("Thanks for Playing");
@@ -243,9 +284,7 @@ async function start() {
 
       //else if for possMoves
     } else if (commands.possibleMoves.includes(word1)) {
-      console.log(`You are currently in ${currentLocation}.`);
-      console.log(bldgMap[currentLocation]);
-      console.log(JSON.stringify(bldgMap[currentLocation]));
+      possibleMoves();
 
       //else if for menu
     } else if (answer == "menu") {
@@ -253,7 +292,9 @@ async function start() {
 
       // else if for look
     } else if (commands.look.includes(word1)) {
-      lookRoom();
+      console.log(word1);
+      console.log(word2);
+      look(word2);
 
       //else if for take
     } else if (commands.take.includes(word1)) {
@@ -270,8 +311,6 @@ async function start() {
       //else if for move
     } else if (commands.move.includes(word1)) {
       move(word2);
-
-      console.log("move");
 
       //else if for Help!
     } else if (commands.helpList.includes(word1)) {

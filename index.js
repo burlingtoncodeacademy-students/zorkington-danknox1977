@@ -24,6 +24,7 @@ let yellowText = "\033[0;33m";
 
 const bldgMap = {
   car: ["driveway", "deliverance"],
+  deliverance: ["car"],
   dining: ["foyer", "kitchen"],
   driveway: ["porch", "car"],
   foyer: ["porch", "hall", "stairs", "dining"],
@@ -54,7 +55,7 @@ const car = new Room(
 
 const deliverance = new Room(
   "deliverance",
-  "The open road, on to the next adventure!",
+  "Freedom, the open road, on to the next adventure!",
   // ["freedom"],
   true
 );
@@ -67,28 +68,28 @@ const dining = new Room(
 );
 const driveway = new Room(
   "driveway",
-  "You look back at where you parked your car and hope you won't have to leave it idling \ntoo long...",
+  "You look back at where you parked your car and hope you won't have to leave it \nidling too long.  You notice several cigarette butts in the gravel.",
   // ["gravel", "cigarette_butts"],
   false
 );
 
 const foyer = new Room(
   "foyer",
-  "Or, antechamber, looks deserted only the sound of a distant television betrays the\nprescence of other humans. There is a stair going up and a hall to your left.",
+  "Or, antechamber, looks deserted only the sound of a distant television betrays the\nprescence of other humans. There is a stair going up and a hall to your left.\nA directory lists the tenants and locations.",
   // ["directory"],
   true
 );
 
 const hall = new Room(
   "hallway",
-  "A well lit hallway leading around the staircase going up to the second floor, there\nare doors closed doors leading off to the right and it makes a left hand turn\n into shadow...",
+  "A well lit hallway leading around the staircase that leads to the second floor, there\n is large landscape painting on the wall.\nThere are doors closed doors leading off to the right while the hall \nmakes a left hand turn\n into shadows...",
   // ["painting"],
   false
 );
 
 const kitchen = new Room(
   "kitchen",
-  "A lovely and well kept kitchen, nobody cooks here",
+  "A lovely and well kept kitchen, nobody cooks here.  There is a microwava and refridgerator\nand several cabinets and drawers",
   // ["Fridge", "cabinet_under_sink", "microwave", "silverware_drawer"],
   false
 );
@@ -102,7 +103,7 @@ const porch = new Room(
 
 const stairs = new Room(
   "stairs",
-  "A grand wooden staircase, the steps are just slightly too tall, as if made for \nsomeone a little taller than you are.",
+  "A grand wooden staircase, the steps are just slightly too tall, as if made for \nsomeone a little taller than you are.  There is a railing to your \nright and what looks like a skateboard halfway up.",
   // [railing, "skateboard"],
   true
 );
@@ -133,6 +134,14 @@ class Item {
   }
 }
 
+const cabinet_under_sink = new Item(
+  "cabinet_under_sink",
+  "descipt",
+  true,
+  false,
+  "kitchen"
+);
+
 const cellphone = new Item(
   "cellphone",
   "Your cellphone, battery at an abysmmal 1%, will only function when plugged into you car \ncharger.",
@@ -141,12 +150,44 @@ const cellphone = new Item(
   "car"
 );
 
-const uber_eats = new Item(
-  "uber_eats",
-  "A bag of late night grub for your hungry customer inside, the note on the ticket provides\nthe entrance code: 93378.",
+const cigarette_butts = new Item(
+  "cigarette_butts",
+  "descript",
   false,
+  false,
+  "driveway"
+);
+
+const directory= new Item(
+  "directory",
+  "discript",
   true,
-  "car"
+  false,
+  "foyer"
+);
+
+const freedom = new Item(
+  "freedom",
+  "Indescibable ecstasy",
+  true,
+  true,
+  "delverance"
+);
+
+const fridge = new Item(
+  "fridge",
+  "descript",
+  true,
+  false,
+  "kitchen"
+);
+
+const gravel = new Item(
+  "gravel",
+  "descript",
+  false,
+  false,
+  "driveway"
 );
 
 const keypad = new Item(
@@ -157,12 +198,68 @@ const keypad = new Item(
   "porch"
 );
 
+const ink_pen = new Item(
+  "ink_pen",
+  "descript",
+  true,
+  true,
+  "dining"
+);
+
+const microwave = new Item(
+  "microwave",
+  "descript",
+  true,
+  false,
+  "kitchen"
+);
+
+const outdoor_life_magazine = new Item(
+  "outdoor_life_magazine",
+  "descript",
+  true,
+  false,
+  "dining"
+);
+
+const painting = new Item(
+  "painting",
+  "descript",
+  true,
+  false,
+  "hallway"
+);
+
 const railing = new Item(
   "railing",
   "A strong wooden railing, this will allow you to safely ascend the staircase.",
   true,
   false,
   "stairs"
+);
+
+const silverware_drawer = new Item(
+  "silerverware_drawer",
+  "descript",
+  true,
+  false,
+  "kitchen"
+);
+
+const skateboard = new Item(
+  "skateboard",
+  "descript",
+  true,
+  true,
+  "stairway"
+);
+
+const uber_eats = new Item(
+  "uber_eats",
+  "A bag of late night grub for your hungry customer inside, the note on the ticket provides\nthe entrance code: 93378.",
+  false,
+  true,
+  "car"
 );
 
 // ------------------------------------PlayerCommands------------------------------------------------ //
@@ -188,8 +285,8 @@ let player = {
 
 // --------------------------------------commandFunctions-------------------------------------------------- //
 
-function drop() {
-  player.inventory.slice(item);
+function drop(dropItem) {
+  player.inventory.slice(dropItem);
   newLocation.Item.push(item);
 }
 
@@ -421,20 +518,20 @@ async function start() {
 }
 
 let itemLookUp = {
-  // cabinet_under_sink: cabinet_under_sink,
+  cabinet_under_sink: cabinet_under_sink,
   cellphone: cellphone,
-  // cigarette_butts: cigarette_butts,
-  // directory: directory,
-  // freedom: freedom,
-  // fridge: fridge,
-  // gravel: gravel,
-  // ink_pen: ink_pen,
+  cigarette_butts: cigarette_butts,
+  directory: directory,
+  freedom: freedom,
+  fridge: fridge,
+  gravel: gravel,
+  ink_pen: ink_pen,
   keypad: keypad,
-  // microwave: microwave,
-  // outdoor_life_magazine: outdoor_life_magazine,
-  // painting: painting,
+  microwave: microwave,
+  outdoor_life_magazine: outdoor_life_magazine,
+  painting: painting,
   railing: railing,
-  // silverware_drawer: silverware_drawer,
-  // skateboard: skateboard,
+  silverware_drawer: silverware_drawer,
+  skateboard: skateboard,
   uber_eats: uber_eats,
 };

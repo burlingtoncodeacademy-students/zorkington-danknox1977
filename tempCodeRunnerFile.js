@@ -1,2 +1,1 @@
-
-function look(objOfInt) {
+slice[item2Add];

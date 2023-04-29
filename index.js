@@ -38,10 +38,10 @@ const bldgMap = {
 
 //Room Class
 class Room {
-  constructor(name, what, locked) {
+  constructor(name, what, Item, locked) {
     this.name = name;
     this.what = what;
-    // this.Item = Item;
+    this.Item = Item;
     this.locked = locked;
   }
 }
@@ -49,62 +49,62 @@ class Room {
 const car = new Room(
   "car",
   "A late model Kia Sorrento, idling obediently, lights on -with some muted music wafting \nfrom a slightly ajar window. Your cellphone battery is too low to remove from the charger,\nThe order of Uber Eats is on the passenger seat.",
-  // [cellphone, uber_eats],
+  ["cellphone", "uber_eats"],
   false
 );
 
 const deliverance = new Room(
   "deliverance",
   "Freedom, the open road, on to the next adventure!",
-  // ["freedom"],
+  ["freedom"],
   true
 );
 
 const dining = new Room(
   "dining room",
   "A formal dining room, not the kind for everyday eating, covered in periodicals \nand office supplies.",
-  // ["outdoor_life_magazine", "ink_pen"],
+  ["outdoor_life_magazine", "ink_pen"],
   false
 );
 const driveway = new Room(
   "driveway",
   "You look back at where you parked your car and hope you won't have to leave it \nidling too long.  You notice several cigarette butts in the gravel.",
-  // ["gravel", "cigarette_butts"],
+  ["gravel", "cigarette_butts"],
   false
 );
 
 const foyer = new Room(
   "foyer",
   "Or, antechamber, looks deserted only the sound of a distant television betrays the\nprescence of other humans. There is a stair going up and a hall to your left.\nA directory lists the tenants and locations.",
-  // ["directory"],
+  ["directory"],
   true
 );
 
 const hall = new Room(
   "hallway",
   "A well lit hallway leading around the staircase that leads to the second floor, there\n is large landscape painting on the wall.\nThere are doors closed doors leading off to the right while the hall \nmakes a left hand turn\n into shadows...",
-  // ["painting"],
+  ["painting"],
   false
 );
 
 const kitchen = new Room(
   "kitchen",
   "A lovely and well kept kitchen, nobody cooks here.  There is a microwava and refridgerator\nand several cabinets and drawers",
-  // ["Fridge", "cabinet_under_sink", "microwave", "silverware_drawer"],
+  ["Fridge", "cabinet_under_sink", "microwave", "silverware_drawer"],
   false
 );
 
 const porch = new Room(
   "porch",
   "The area before the entrance could better be described as a sidewalk, \nA keypad by the door awaits your input.",
-  // [keypad],
+  ["keypad"],
   false
 );
 
 const stairs = new Room(
   "stairs",
   "A grand wooden staircase, the steps are just slightly too tall, as if made for \nsomeone a little taller than you are.  There is a railing to your \nright and what looks like a skateboard halfway up.",
-  // [railing, "skateboard"],
+  ["railing", "skateboard"],
   true
 );
 
@@ -158,13 +158,7 @@ const cigarette_butts = new Item(
   "driveway"
 );
 
-const directory= new Item(
-  "directory",
-  "discript",
-  true,
-  false,
-  "foyer"
-);
+const directory = new Item("directory", "discript", true, false, "foyer");
 
 const freedom = new Item(
   "freedom",
@@ -174,21 +168,9 @@ const freedom = new Item(
   "delverance"
 );
 
-const fridge = new Item(
-  "fridge",
-  "descript",
-  true,
-  false,
-  "kitchen"
-);
+const fridge = new Item("fridge", "descript", true, false, "kitchen");
 
-const gravel = new Item(
-  "gravel",
-  "descript",
-  false,
-  false,
-  "driveway"
-);
+const gravel = new Item("gravel", "descript", false, false, "driveway");
 
 const keypad = new Item(
   "keypad",
@@ -198,21 +180,9 @@ const keypad = new Item(
   "porch"
 );
 
-const ink_pen = new Item(
-  "ink_pen",
-  "descript",
-  true,
-  true,
-  "dining"
-);
+const ink_pen = new Item("ink_pen", "descript", true, true, "dining");
 
-const microwave = new Item(
-  "microwave",
-  "descript",
-  true,
-  false,
-  "kitchen"
-);
+const microwave = new Item("microwave", "descript", true, false, "kitchen");
 
 const outdoor_life_magazine = new Item(
   "outdoor_life_magazine",
@@ -222,13 +192,7 @@ const outdoor_life_magazine = new Item(
   "dining"
 );
 
-const painting = new Item(
-  "painting",
-  "descript",
-  true,
-  false,
-  "hallway"
-);
+const painting = new Item("painting", "descript", true, false, "hallway");
 
 const railing = new Item(
   "railing",
@@ -248,8 +212,8 @@ const silverware_drawer = new Item(
 
 const skateboard = new Item(
   "skateboard",
-  "descript",
-  true,
+  "Desipite its obviouse wear, this skateboard looks extremely slippery.\nWhen this is on a stair it is a deadly hazard.",
+  false,
   true,
   "stairway"
 );
@@ -298,9 +262,6 @@ function inventory() {
   console.log(player.inventory);
 }
 
-function lookItem() {
-  console.log(item.what);
-}
 //function to look at rooms
 function look(objOfInt) {
   if (objOfInt == currentLocation) {
@@ -375,17 +336,34 @@ function move(newLocation) {
 function possibleMoves() {
   console.log(`You are currently in ${currentLocation}.`);
   let poss = JSON.stringify(bldgMap[currentLocation]);
-  console.log(`From here you can go to: ${poss}`);
+  let possItems = JSON.stringify(roomLookUp[currentLocation].Item);
+  console.log(`From here you can go to: ${poss}.`);
+  if (possItems !== false) console.log(`Around you, you see ${possItems}.`);
 }
 
 function take(item2Add) {
   // let item2Add = addItem
-  if (itemLookUp.uber_eats.name.includes(item2Add)) {
-    if (itemLookUp.uber_eats.place.includes(currentLocation)) {
-      if (itemLookUp.uber_eats.inv === true) {
+  if (itemLookUp[item2Add].name.includes(item2Add)) {
+    if (itemLookUp[item2Add].place.includes(currentLocation)) {
+      if (itemLookUp[item2Add].inv === true) {
         console.log(`You add ${item2Add} to your inventory.`);
         player.inventory.push(item2Add);
-        uber_eats.place = "inventory";
+        [item2Add].place = "inventory";
+        // Removing the specified element by value from the array
+          for (var i = 0; i < roomLookUp[currentLocation].Item.length; i++) {
+            if (roomLookUp[currentLocation].Item[i] === item2Add) {
+                var spliced = roomLookUp[currentLocation].Item.splice(i, 1);
+                
+            }
+
+        console.log(roomLookUp[currentLocation].Item);
+          }
+        // if (itemLookUp.uber_eats.name.includes(item2Add)) {
+        //   if (itemLookUp.uber_eats.place.includes(currentLocation)) {
+        //     if (itemLookUp.uber_eats.inv === true) {
+        //       console.log(`You add ${item2Add} to your inventory.`);
+        //       player.inventory.push(item2Add);
+        //       uber_eats.place = "inventory";
       }
     }
   } else {
@@ -394,14 +372,14 @@ function take(item2Add) {
 }
 // -------------------------------------UseItem--------------------------------------------------- //
 
-function use(useItem) {
+async function use(useItem) {
   if (itemLookUp.keypad.name.includes(useItem)) {
-    start();
-    async function start() {
-      var door = "locked";
+    let passCode = "";
+    await keyStart();
+    async function keyStart() {
       let doorPrompt = "Please input PassCode to enter (type exit to end) >_";
-      while (door !== "open" || passCode == "exit") {
-        let passCode = await ask(doorPrompt);
+      while (passCode !== "exit") {
+        passCode = await ask(doorPrompt);
 
         if (passCode !== "93378") {
           if (passCode !== "exit") {
@@ -409,17 +387,16 @@ function use(useItem) {
             console.log("A disembodied voice drones : That code is incorrect.");
           } else {
             console.log(passCode);
-            passcode = "exit";
-            // process.exit()
+            passCode = "exit";
           }
         } else {
           console.log(passCode);
           console.log(
             "A barely audible *click* and the heavy door creaks open."
           );
-          door = "open";
-          foyer.locked == false;
-          console.log(foyer.locked);
+
+          foyer.locked = false;
+          passCode = "exit";
         }
       }
     }
@@ -439,8 +416,7 @@ let currentLocation = "car";
 
 const welcomeMessage = `182 Main St.
 You are standing on Main Street between Church and South Winooski.
-There is a door here. The doorknob has a keypad built-in.
-On the door is a handwritten sign. \nNO UNAUTHORIZED VISITORS -This means you Carl
+There is a door here. The doorknob has a keypad built-in.\nOn the door is a handwritten sign. \n--NO UNAUTHORIZED VISITORS-- That means you Carl
 You are meant to Deliver the Uber Eats to someone at this address.`;
 
 const prompt = `What do you do? >_`;
@@ -506,7 +482,7 @@ async function start() {
       //else if for use
     } else if (commands.use.includes(word1)) {
       console.log("use");
-      use(word2);
+      await use(word2);
 
       //else for help
     } else {

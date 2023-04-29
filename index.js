@@ -137,7 +137,7 @@ class Item {
 const cabinet_under_sink = new Item(
   "cabinet_under_sink",
   "descipt",
-  true,
+  false,
   false,
   "kitchen"
 );
@@ -163,8 +163,8 @@ const directory = new Item("directory", "discript", true, false, "foyer");
 const freedom = new Item(
   "freedom",
   "Indescibable ecstasy",
-  true,
-  true,
+  false,
+  false,
   "delverance"
 );
 
@@ -205,7 +205,7 @@ const railing = new Item(
 const silverware_drawer = new Item(
   "silerverware_drawer",
   "descript",
-  true,
+  false,
   false,
   "kitchen"
 );
@@ -255,9 +255,9 @@ function drop(dropItem) {
     if (player.inventory[i] === dropItem) {
       var spliced = player.inventory.splice(i, 1);
     }
-  roomLookUp[currentLocation].Item.push(dropItem);
-  itemLookUp[dropItem].place = currentLocation;
-  console.log(roomLookUp[currentLocation].Item)
+    roomLookUp[currentLocation].Item.push(dropItem);
+    itemLookUp[dropItem].place = currentLocation;
+    console.log(roomLookUp[currentLocation].Item);
   }
 }
 
@@ -403,11 +403,30 @@ async function use(useItem) {
         }
       }
     }
-  } else {
-    console.log(`You can't use the ${useItem} that way.`);
+  } else if (itemLookUp[useItem]?.name.includes(useItem)) {
+    if (itemLookUp[useItem].util === true) {
+      if (useItem == railing) {
+        if (skateboard.place != stairs) {
+          currentLocation = secondFloor;
+        } else {
+          console.log(
+            `You have died after falling backward in a farcical display of ineptitude.\nThe uber eats flung from your grasping hand.\nYou have failed your mission.\n       GaMe OvEr.`
+          );
+          gameStatus = "end";
+        }
+      } else if (useItem == freedom) {
+        if ((gameStatus = "almost")) {
+          console.log(
+            "You have successfully completed your work shift!\n     Congratulations!"
+          );
+          gameStatus = "won";
+        }
+      } else {
+        console.log(`You can't use the ${useItem} that way.`);
+      }
+    }
   }
 }
-
 function quit() {
   console.log("Thanks for Playing");
   process.exit();

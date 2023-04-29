@@ -250,8 +250,15 @@ let player = {
 // --------------------------------------commandFunctions-------------------------------------------------- //
 
 function drop(dropItem) {
-  player.inventory.slice(dropItem);
-  newLocation.Item.push(item);
+  // Removing the specified element by value from the array
+  for (var i = 0; i < player.inventory.length; i++) {
+    if (player.inventory[i] === dropItem) {
+      var spliced = player.inventory.splice(i, 1);
+    }
+  roomLookUp[currentLocation].Item.push(dropItem);
+  itemLookUp[dropItem].place = currentLocation;
+  console.log(roomLookUp[currentLocation].Item)
+  }
 }
 
 function help() {
@@ -325,7 +332,7 @@ function move(newLocation) {
     if (foyer.locked === true) {
       console.log(`The front door is locked, use keypad to enter.`);
     } else {
-      console.log(`You enter the building.`);
+      console.log(`Moving to ${newLocation}... `);
       currentLocation = newLocation;
     }
   } else {
@@ -333,6 +340,8 @@ function move(newLocation) {
     currentLocation = newLocation;
   }
 }
+
+//function to show possible moves and interactable objects
 function possibleMoves() {
   console.log(`You are currently in ${currentLocation}.`);
   let poss = JSON.stringify(bldgMap[currentLocation]);
@@ -340,34 +349,28 @@ function possibleMoves() {
   console.log(`From here you can go to: ${poss}.`);
   if (possItems !== false) console.log(`Around you, you see ${possItems}.`);
 }
-
+//function to add items to inventory and remove them from existing locations
 function take(item2Add) {
-  // let item2Add = addItem
-  if (itemLookUp[item2Add].name.includes(item2Add)) {
+  if (itemLookUp[item2Add]?.name.includes(item2Add)) {
     if (itemLookUp[item2Add].place.includes(currentLocation)) {
       if (itemLookUp[item2Add].inv === true) {
         console.log(`You add ${item2Add} to your inventory.`);
         player.inventory.push(item2Add);
         [item2Add].place = "inventory";
         // Removing the specified element by value from the array
-          for (var i = 0; i < roomLookUp[currentLocation].Item.length; i++) {
-            if (roomLookUp[currentLocation].Item[i] === item2Add) {
-                var spliced = roomLookUp[currentLocation].Item.splice(i, 1);
-                
-            }
-
-        console.log(roomLookUp[currentLocation].Item);
+        for (var i = 0; i < roomLookUp[currentLocation].Item.length; i++) {
+          if (roomLookUp[currentLocation].Item[i] === item2Add) {
+            var spliced = roomLookUp[currentLocation].Item.splice(i, 1);
           }
-        // if (itemLookUp.uber_eats.name.includes(item2Add)) {
-        //   if (itemLookUp.uber_eats.place.includes(currentLocation)) {
-        //     if (itemLookUp.uber_eats.inv === true) {
-        //       console.log(`You add ${item2Add} to your inventory.`);
-        //       player.inventory.push(item2Add);
-        //       uber_eats.place = "inventory";
+        }
+      } else {
+        console.log(`You can not pick up ${item2Add}.`);
       }
+    } else {
+      console.log(`${item2Add} is not at ${currentLocation}.`);
     }
   } else {
-    console.log("You can't do that.");
+    console.log(`${item2Add} is not a valid choice.`);
   }
 }
 // -------------------------------------UseItem--------------------------------------------------- //

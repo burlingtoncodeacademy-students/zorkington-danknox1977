@@ -1,4 +1,5 @@
 const { lookup } = require("dns");
+const { setUncaughtExceptionCaptureCallback } = require("process");
 const readline = require("readline");
 const readlineInterface = readline.createInterface(
   process.stdin,
@@ -31,7 +32,7 @@ const bldgMap = {
   hall: ["foyer", "kitchen"],
   kitchen: ["dining", "hall"],
   porch: ["driveway", "foyer"],
-  stairs: ["foyer"],
+  stairs: ["foyer", "second_floor"],
 };
 
 // ---------------------------------Room Classes--------------------------------------------------- //
@@ -75,7 +76,7 @@ const driveway = new Room(
 
 const foyer = new Room(
   "foyer",
-  "Or, antechamber, looks deserted only the sound of a distant television betrays the\nprescence of other humans. There is a stair going up and a hall to your left.\nA directory lists the tenants and locations.",
+  "Or, antechamber, looks deserted only the sound of a distant television betrays the\npresence of other humans. There is a stair going up and a hall to your right.\nA directory lists the tenants and locations.",
   ["directory"],
   true
 );
@@ -96,16 +97,23 @@ const kitchen = new Room(
 
 const porch = new Room(
   "porch",
-  "The area before the entrance could better be described as a sidewalk, \nA keypad by the door awaits your input.",
+  "The area before the entrance could best be described as a sidewalk, \nOn the door is a handwritten sign. \n--NO UNAUTHORIZED VISITORS-- That means you Carl\nA keypad by the door awaits your input.",
   ["keypad"],
   false
+);
+
+const second_floor = new Room(
+  "second_floor",
+  "At the top of the stairs you see a shadowy figure, with their grasping hand out-stretched.",
+  [],
+  true
 );
 
 const stairs = new Room(
   "stairs",
   "A grand wooden staircase, the steps are just slightly too tall, as if made for \nsomeone a little taller than you are.  There is a railing to your \nright and what looks like a skateboard halfway up.",
   ["railing", "skateboard"],
-  true
+  false
 );
 
 // -----------------------------------room/LookUpTable------------------------------------------------------ //
@@ -119,6 +127,7 @@ let roomLookUp = {
   hall: hall,
   kitchen: kitchen,
   porch: porch,
+  second_floor: second_floor,
   stairs: stairs,
 };
 
@@ -144,7 +153,7 @@ const cabinet_under_sink = new Item(
 
 const cellphone = new Item(
   "cellphone",
-  "Your cellphone, battery at an abysmmal 1%, will only function when plugged into you car \ncharger.",
+  "Your cellphone, battery at an abysmmal 1%, will only function when\nplugged into your car charger.",
   false,
   false,
   "car"
@@ -158,11 +167,11 @@ const cigarette_butts = new Item(
   "driveway"
 );
 
-const directory = new Item("directory", "discript", true, false, "foyer");
+const directory = new Item("directory", "descript", true, false, "foyer");
 
 const freedom = new Item(
   "freedom",
-  "Indescibable ecstasy",
+  "Indescribable ecstasy",
   false,
   false,
   "delverance"
@@ -235,7 +244,7 @@ let commands = {
   look: ["l", "look"],
   menu: ["m", "menu"],
   move: ["m", "move"],
-  possibleMoves: ["w", "where"],
+  possibleMoves: ["w", "where", "what"],
   quit: ["x", "q", "exit", "end", "quit"],
   use: ["u", "use"],
   take: ["t", "take"],
@@ -269,52 +278,25 @@ function inventory() {
   console.log(player.inventory);
 }
 
-//function to look at rooms
+//function to look at rooms & items
 function look(objOfInt) {
   if (objOfInt == currentLocation) {
-    if (roomLookUp.car.name.includes(objOfInt)) {
-      console.log(roomLookUp.car.what);
-    } else if (roomLookUp.deliverance.name.includes(objOfInt)) {
-      console.log(roomLookUp.deliverance.what);
-    } else if (roomLookUp.driveway.name.includes(objOfInt)) {
-      console.log(roomLookUp.driveway.what);
-    } else if (roomLookUp.foyer.name.includes(objOfInt)) {
-      console.log(roomLookUp.foyer.what);
-    } else if (roomLookUp.hall.name.includes(objOfInt)) {
-      console.log(roomLookUp.hall.what);
-    } else if (roomLookUp.kitchen.name.includes(objOfInt)) {
-      console.log(roomLookUp.kitchen.what);
-    } else if (roomLookUp.porch.name.includes(objOfInt)) {
-      console.log(roomLookUp.porch.what);
-    } else if (roomLookUp.stairs.name.includes(objOfInt)) {
-      console.log(roomLookUp.stairs.what);
+    if (roomLookUp[objOfInt].name.includes(objOfInt)) {
+      console.log(roomLookUp[objOfInt].what);
     }
-  } else if (itemLookUp.cellphone.name.includes(objOfInt)) {
-    if (itemLookUp.cellphone.place.includes(currentLocation)) {
-      console.log(cellphone.what);
+  } else if (itemLookUp[objOfInt].name.includes(objOfInt)) {
+    if (
+      itemLookUp[objOfInt].place.includes(currentLocation) ||
+      player.inventory.includes(objOfInt)
+    ) {
+      console.log(itemLookUp[objOfInt].what);
     } else {
       console.log(`${objOfInt} is not at ${currentLocation}.`);
     }
-  } else if (itemLookUp.uber_eats.name.includes(objOfInt)) {
-    if (itemLookUp.uber_eats.place == "inventory") {
-      console.log(uber_eats.what);
-    } else if (itemLookUp.uber_eats.place.includes(currentLocation)) {
-      console.log(uber_eats.what);
-    } else {
-      console.log(`${objOfInt} is not at ${currentLocation}.`);
-    }
-
-    // } else if (itemLookUp.Item.name.includes(objOfInt)) {
-    //   if (itemLookUp.item.place.includes(currentLocation)) {
-    //     console.log(Item.what);
-    //   } else {
-    //     console.log(`${objOfInt} is not at ${currentLocation}.`)
-    //   }
   } else {
     console.log(`You can not see ${objOfInt} from ${currentLocation}`);
   }
 }
-
 function menu() {
   //placeholder
 }
@@ -335,6 +317,13 @@ function move(newLocation) {
       console.log(`Moving to ${newLocation}... `);
       currentLocation = newLocation;
     }
+  } else if (roomLookUp[newLocation].locked === true) {
+    console.log(
+      `You can not go to ${newLocation} from ${currentLocation} the way is blocked`
+    );
+
+    // } else if ([currentLocation] == "stairs" && [newLocation] == "second_floor") {
+    //     if
   } else {
     console.log(`Moving to ${newLocation}... `);
     currentLocation = newLocation;
@@ -376,57 +365,69 @@ function take(item2Add) {
 // -------------------------------------UseItem--------------------------------------------------- //
 
 async function use(useItem) {
-  if (itemLookUp.keypad.name.includes(useItem)) {
-    let passCode = "";
-    await keyStart();
-    async function keyStart() {
-      let doorPrompt = "Please input PassCode to enter (type exit to end) >_";
-      while (passCode !== "exit") {
-        passCode = await ask(doorPrompt);
+  if (
+    roomLookUp[currentLocation].Item.includes(useItem) ||
+    player.inventory.includes(useItem)
+  )
+    if (itemLookUp.keypad.name.includes(useItem)) {
+      let passCode = "";
+      await keyStart();
+      async function keyStart() {
+        let doorPrompt = "Please input PassCode to enter (type exit to end) >_";
+        while (passCode !== "exit") {
+          passCode = await ask(doorPrompt);
 
-        if (passCode !== "93378") {
-          if (passCode !== "exit") {
-            console.log(passCode);
-            console.log("A disembodied voice drones : That code is incorrect.");
+          if (passCode !== "93378") {
+            if (passCode !== "exit") {
+              console.log(passCode);
+              console.log(
+                "A disembodied voice drones : That code is incorrect."
+              );
+            } else {
+              console.log(passCode);
+              passCode = "exit";
+            }
           } else {
             console.log(passCode);
+            console.log(
+              "A barely audible *click* and the heavy door creaks open."
+            );
+
+            foyer.locked = false;
             passCode = "exit";
           }
-        } else {
-          console.log(passCode);
-          console.log(
-            "A barely audible *click* and the heavy door creaks open."
-          );
-
-          foyer.locked = false;
-          passCode = "exit";
         }
       }
-    }
-  } else if (itemLookUp[useItem]?.name.includes(useItem)) {
-    if (itemLookUp[useItem].util === true) {
-      if (useItem == railing) {
-        if (skateboard.place != stairs) {
-          currentLocation = secondFloor;
+    } else if (itemLookUp[useItem]?.name.includes(useItem)) {
+      if (itemLookUp[useItem].util === true) {
+        if (useItem == railing) {
+          if (skateboard.place != stairs) {
+            currentLocation = secondFloor;
+          } else {
+            console.log(
+              `You have died after falling backward in a farcical display of ineptitude.\nThe uber eats flung from your grasping hand.`
+            );
+            console.log(death);
+            gameStatus = "end";
+          }
+        } else if (useItem == freedom) {
+          if ((gameStatus = "almost")) {
+            console.log(
+              "You have successfully completed your work shift!\n   ___Congratulations!___"
+            );
+            gameStatus = "won";
+          } else {
+            console.log(`You can't use ${useItem}.`);
+          }
         } else {
-          console.log(
-            `You have died after falling backward in a farcical display of ineptitude.\nThe uber eats flung from your grasping hand.\nYou have failed your mission.\n       GaMe OvEr.`
-          );
-          gameStatus = "end";
+          console.log(`You can't use the ${useItem} that way.`);
         }
-      } else if (useItem == freedom) {
-        if ((gameStatus = "almost")) {
-          console.log(
-            "You have successfully completed your work shift!\n     Congratulations!"
-          );
-          gameStatus = "won";
-        }
-      } else {
-        console.log(`You can't use the ${useItem} that way.`);
       }
+    } else {
+      console.log(`You can not access ${useItem} from here now.`);
     }
-  }
 }
+
 function quit() {
   console.log("Thanks for Playing");
   process.exit();
@@ -437,11 +438,11 @@ var gameStatus = "pending";
 let currentLocation = "car";
 
 const welcomeMessage = `182 Main St.
-You are standing on Main Street between Church and South Winooski.
-There is a door here. The doorknob has a keypad built-in.\nOn the door is a handwritten sign. \n--NO UNAUTHORIZED VISITORS-- That means you Carl
-You are meant to Deliver the Uber Eats to someone at this address.`;
+You are sitting in your car, parked on Main Street between Church and South Winooski.\nThe streets are deserted, you see that there is a light on in a second floor window.\nYou are meant to Deliver the Uber Eats to someone at this address.`;
 
 const prompt = `What do you do? >_`;
+
+const death = `The dead can not deliver food, your mission failed...\n   ___GaMe OvEr___`;
 
 // ---------------------------------AsyncInterfaceLoop(s)-------------------------------------------------- //
 

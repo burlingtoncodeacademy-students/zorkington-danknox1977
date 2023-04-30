@@ -68,6 +68,7 @@ const dining = new Room(
   ["outdoor_life_magazine", "ink_pen"],
   false
 );
+
 const driveway = new Room(
   "driveway",
   "You look back at where you parked your car and hope you won't have to leave it \nidling too long.  You notice several cigarette butts in the gravel.",
@@ -92,7 +93,7 @@ const hall = new Room(
 const kitchen = new Room(
   "kitchen",
   "A lovely and well kept kitchen, nobody cooks here.  There is a microwava and refridgerator\nand several cabinets and drawers",
-  ["Fridge", "cabinet_under_sink", "microwave", "silverware_drawer"],
+  ["fridge", "cabinet_under_sink", "microwave", "silverware_drawer"],
   false
 );
 
@@ -105,7 +106,7 @@ const porch = new Room(
 
 const second_floor = new Room(
   "second_floor",
-  "At the top of the stairs you see a shadowy figure, with their grasping hand out-stretched.",
+  "At the top of the stairs you see a shadowy figure, with their grasping hand out-stretched.\nThe figure emits a low, guttural growl it sounds like \'Cccccaaaaarrrrrllllll\'...",
   [],
   true
 );
@@ -146,7 +147,7 @@ class Item {
 
 const cabinet_under_sink = new Item(
   "cabinet_under_sink",
-  "descipt",
+  "Sparsely filled with cleaning prodcuts and a small wastebasket.",
   false,
   false,
   "kitchen"
@@ -162,13 +163,13 @@ const cellphone = new Item(
 
 const cigarette_butts = new Item(
   "cigarette_butts",
-  "descript",
+  "Assorted brands, someone who lives nearby enjoys the occasional trip to flavour country.",
   false,
   false,
   "driveway"
 );
 
-const directory = new Item("directory", "descript", true, false, "foyer");
+const directory = new Item("directory", "Many unoccupied offices, you see residential information for the 2nd floor.", true, false, "foyer");
 
 const freedom = new Item(
   "freedom",
@@ -178,9 +179,9 @@ const freedom = new Item(
   "deliverance"
 );
 
-const fridge = new Item("fridge", "descript", true, false, "kitchen");
+const fridge = new Item("fridge", "You see some curdled milk and some takeout soy sauce packets.", true, false, "kitchen");
 
-const gravel = new Item("gravel", "descript", false, false, "driveway");
+const gravel = new Item("gravel", "Small pieces of igneous rock.", false, false, "driveway");
 
 const keypad = new Item(
   "keypad",
@@ -190,19 +191,19 @@ const keypad = new Item(
   "porch"
 );
 
-const ink_pen = new Item("ink_pen", "descript", true, true, "dining");
+const ink_pen = new Item("ink_pen", "A ballpoint clicker pen with the name of a local business on it, the pen is out of ink.", true, true, "dining");
 
-const microwave = new Item("microwave", "descript", true, false, "kitchen");
+const microwave = new Item("microwave", "This microwave still smells pleasantly like popcorn.", true, false, "kitchen");
 
 const outdoor_life_magazine = new Item(
   "outdoor_life_magazine",
-  "descript",
+  "The date of this magazine says June of 2011 - the main article has someting to do with bass fishing.",
   true,
   false,
   "dining"
 );
 
-const painting = new Item("painting", "descript", true, false, "hallway");
+const painting = new Item("painting", "A reproduction of a famous painting of a boring scene.", true, false, "hallway");
 
 const railing = new Item(
   "railing",
@@ -214,7 +215,7 @@ const railing = new Item(
 
 const silverware_drawer = new Item(
   "silerverware_drawer",
-  "descript",
+  "Full of plastic utensils in plastic wrappers.",
   false,
   false,
   "kitchen"
@@ -222,7 +223,7 @@ const silverware_drawer = new Item(
 
 const skateboard = new Item(
   "skateboard",
-  "Desipite its obvious overall wear, this skateboard's hubs look freshly greased.\nWhen this is on a stair it is a deadly hazard.",
+  "Despite its obvious overall wear, this skateboard's hubs look freshly greased.\nWhen this is on a stair it is a deadly hazard.",
   false,
   true,
   "stairs"
@@ -283,6 +284,8 @@ function drop(dropItem) {
 
 function help() {
   console.log(`You are currently at ${currentLocation}`);
+  console.log("Please give your instructions in the following format: \"word 1 = command\" \"word 2 = target of command\".")
+  console.log(commands)
 }
 
 function inventory() {
@@ -313,7 +316,6 @@ function menu() {
 }
 
 //function to move between locations
-
 function move(newLocation) {
   let possMoves = bldgMap[currentLocation];
 
@@ -327,6 +329,12 @@ function move(newLocation) {
     } else {
       console.log(`Moving to ${newLocation}... `);
       currentLocation = newLocation;
+      if (uber_eats.place !== "second_floor") {
+      console.log("The Uber Eats needs to be delivered!");
+      } else {
+        console.log("The path to freedom is clear.");
+
+      }
     }
   } else if (roomLookUp[newLocation].locked === true) {
     console.log(
@@ -338,6 +346,12 @@ function move(newLocation) {
   } else {
     console.log(`Moving to ${newLocation}... `);
     currentLocation = newLocation;
+    if (uber_eats.place !== "second_floor") {
+      console.log("The Uber Eats needs to be delivered!");
+      } else {
+        console.log("The path to freedom is clear.");
+
+      }
   }
 }
 
@@ -357,7 +371,6 @@ function take(item2Add) {
       if (itemLookUp[item2Add].inv === true) {
         if (uber_eats.place !== "second_floor") {
           deliverance.locked == true;
-          console.log(deliverance.locked)
           console.log("The Uber Eats needs to be delivered!");
         }
         console.log(`You add ${item2Add} to your inventory.`);
@@ -422,7 +435,6 @@ async function use(useItem) {
             );
 
             foyer.locked = false;
-            console.log(foyer.locked);
             passCode = "exit";
           }
         }
@@ -474,7 +486,6 @@ function quit() {
 var gameStatus = "pending";
 
 let currentLocation = "car";
-// let currentLocation = "stairs";
 
 const welcomeMessage = `182 Main St.
 You are sitting in your car, parked on Main Street between Church and South Winooski.\nThe streets are deserted, you see that there is a light on in a second floor window. \nYou are meant to deliver the Uber Eats to someone at this address.`;
@@ -513,7 +524,6 @@ async function start() {
       //else if for Help!
       //Should include list of commands and directions on how to use two word answers
     } else if (commands.helpList.includes(word1)) {
-      console.log("help");
       help();
 
       //else if for inventory
@@ -523,9 +533,11 @@ async function start() {
       // else if for look
     } else if (commands.look.includes(word1)) {
       look(word2);
+
       //else if for menu
     } else if (answer == "menu") {
       console.log("menu");
+
       //else if for move
     } else if (commands.move.includes(word1)) {
       move(word2);
@@ -541,6 +553,8 @@ async function start() {
       //else if for take
     } else if (commands.take.includes(word1)) {
       take(word2);
+
+      //else if for Teleport
     } else if (commands.teleport.includes(word1)) {
       teleport(word2);
 
